@@ -7,21 +7,25 @@ contract SafeMath {
     function safeAdd(uint a, uint b) public pure returns (uint c) {
         c = a + b;
         require(c >= a);
+        return c;
     }
  
     function safeSub(uint a, uint b) public pure returns (uint c) {
         require(b <= a);
         c = a - b;
+        return c;
     }
  
     function safeMul(uint a, uint b) public pure returns (uint c) {
         c = a * b;
         require(a == 0 || c / a == b);
+        return c;
     }
  
     function safeDiv(uint a, uint b) public pure returns (uint c) {
         require(b > 0);
         c = a / b;
+        return c;
     }
 }
  
@@ -36,7 +40,7 @@ contract ERC20Interface {
     function approve(address spender, uint tokens) public returns (bool success);
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
  
-    event Transfer(address indexed from, address indexed to, uint tokens);
+    event Transfer(address indexed_from, address indexed_to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
  
@@ -48,7 +52,7 @@ contract ApproveAndCallFallBack {
 }
  
 //Actual token contract
- 
+
 contract QKCToken is ERC20Interface, SafeMath {
     string public symbol;
     string public  name;
@@ -56,23 +60,25 @@ contract QKCToken is ERC20Interface, SafeMath {
     uint public _totalSupply;
  
     mapping(address => uint) balances;
-    mapping(address => mapping(address => uint)) allowed;
- 
+    mapping(address => mapping(address => uint)) allowed;  
+    address public i_owner;
+
     constructor() public {
         symbol = "QKC";
         name = "QuikNode Coin";
         decimals = 2;
         _totalSupply = 100000;
-        balances[YOUR_METAMASK_WALLET_ADDRESS] = _totalSupply;
-        emit Transfer(address(0), YOUR_METAMASK_WALLET_ADDRESS, _totalSupply);
+        i_owner = msg.sender;
+        balances[i_owner] = _totalSupply;
+        emit Transfer(address(0), i_owner, _totalSupply);
     }
  
     function totalSupply() public constant returns (uint) {
-        return _totalSupply  - balances[address(0)];
+        return _totalSupply - balances[address(0)];
     }
  
-    function balanceOf(address tokenOwner) public constant returns (uint balance) {
-        return balances[tokenOwner];
+    function balanceOf(address token_owner) public constant returns (uint) {
+        return balances[token_owner];
     }
  
     function transfer(address to, uint tokens) public returns (bool success) {
